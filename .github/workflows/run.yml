@@ -1,11 +1,11 @@
-name: Liang61_Iron_Radar
+name: Liang61_Iron_Action
 
 on:
   schedule:
-    - cron: '45 1 * * 1-5'
-    - cron: '15 2 * * 1-5'
-    - cron: '0 6 * * 1-5'
-    - cron: '45 6 * * 1-5'
+    - cron: '45 1 * * 1-5' # 09:45
+    - cron: '15 2 * * 1-5' # 10:15
+    - cron: '0 6 * * 1-5'  # 14:00
+    - cron: '45 6 * * 1-5' # 14:45
   workflow_dispatch:
 
 permissions:
@@ -14,29 +14,21 @@ permissions:
   id-token: write
 
 jobs:
-  scan_and_deploy:
+  run_strategy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Python Setup
+      - uses: actions/checkout@v4
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install akshare pandas requests --upgrade
-
-      - name: Execute Strategy
+      - name: Install Deps
+        run: pip install akshare pandas requests
+      - name: Scan
         run: python main.py
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4 # 升级到 v4 解决 Node.js 警告
+      - name: Deploy to Web
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
           publish_branch: gh-pages
-          # 删除了报错的 force_with_lease 这一行
